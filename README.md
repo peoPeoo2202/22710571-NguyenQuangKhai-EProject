@@ -1,6 +1,28 @@
 # EProject - Phase 1
 
-README này viết bằng tiếng Việt để mô tả nhanh project microservices trong repository.
+EProject - Phase 1/
+├── .github/workflows/
+│   └──ci.yml                 # CI/CD pipeline
+├── auth/
+│   ├── src/
+│   │   ├── controllers/         # Auth business logic
+│   │   ├── routes/             # API endpoints
+│   │   ├── services/           # Core auth services
+│   │   └── test/               # Auth tests
+│   ├── Dockerfile
+│   └── package.json
+├── product/
+│   ├── src/
+│   │   ├── controllers/        # Product business logic
+│   │   ├── routes/            # API endpoints
+│   │   ├── services/          # Core product services
+│   │   └── test/              # Product tests
+│   ├── Dockerfile
+│   └── package.json
+├── order/                     # Future service
+├── api-gateway/              # Future service
+├── docker-compose.yml        # Local development
+└── README.md
 
 ## Mô tả
 Dự án là một hệ thống microservices gồm các service chính:
@@ -103,3 +125,4 @@ Nếu cần hỗ trợ hoặc muốn đóng góp, vui lòng mở issue hoặc PR
 ---
 
 Tạo bởi team dự án. Cập nhật README khi có thay đổi cấu trúc hoặc ports.
+
