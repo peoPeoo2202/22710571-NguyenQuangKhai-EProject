@@ -1,128 +1,139 @@
 # EProject - Phase 1
 
+EProject - Phase 1
+```
 EProject - Phase 1/
 ├── .github/workflows/
-│   └──ci.yml                 # CI/CD pipeline
+│   └── ci.yml                 # CI/CD pipeline
 ├── auth/
 │   ├── src/
-│   │   ├── controllers/         # Auth business logic
-│   │   ├── routes/             # API endpoints
-│   │   ├── services/           # Core auth services
-│   │   └── test/               # Auth tests
+│   │   ├── controllers/       # Auth business logic
+│   │   ├── routes/            # API endpoints
+│   │   ├── services/          # Core auth services
+│   │   └── test/              # Auth tests
 │   ├── Dockerfile
 │   └── package.json
 ├── product/
 │   ├── src/
-│   │   ├── controllers/        # Product business logic
+│   │   ├── controllers/       # Product business logic
 │   │   ├── routes/            # API endpoints
 │   │   ├── services/          # Core product services
 │   │   └── test/              # Product tests
 │   ├── Dockerfile
 │   └── package.json
 ├── order/                     # Future service
-├── api-gateway/              # Future service
-├── docker-compose.yml        # Local development
+├── api-gateway/               # Future service
+├── docker-compose.yml         # Local development
 └── README.md
+```
 
-## Mô tả
-Dự án là một hệ thống microservices gồm các service chính:
-- `auth` — service xác thực
-- `product` — service quản lý sản phẩm
-- `order` — service xử lý đơn hàng
-- `api-gateway` — gateway để client gọi vào các service
+## Mô tả ngắn gọn
+EProject là một hệ thống microservices gồm các service chính:
+- `auth` — Service xác thực (đăng nhập, đăng ký, JWT…)
+- `product` — Service quản lý sản phẩm
+- `order` — Service xử lý đơn hàng (dự định)
+- `api-gateway` — Gateway cho client (dự định)
 
-Hệ thống sử dụng MongoDB làm database và RabbitMQ làm message broker. Mỗi service có Dockerfile riêng và được cấu hình trong `docker-compose.yaml`.
+Hệ thống dùng MongoDB làm database và RabbitMQ làm message broker. Mỗi service có Dockerfile riêng và được cấu hình trong `docker-compose.yml` để dễ triển khai cục bộ.
 
-## Kiến trúc & Ports mặc định
-Các port mặc định (có thể thay đổi trong `docker-compose.yaml` hoặc `.env`):
-- MongoDB (container): 27017, ánh xạ host:container ví dụ `37017:27017`
+## Yêu cầu
+- Docker & Docker Compose (project sử dụng compose v3.8+)
+- Node.js (nếu muốn chạy từng service cục bộ)
+- npm hoặc yarn (để cài dependencies khi chạy local)
+
+## Ports mặc định
+(Các port có thể được thay đổi bằng `.env` hoặc `docker-compose.yml`.)
+- MongoDB (container): 27017 (ví dụ ánh xạ host 37017:27017)
 - RabbitMQ:
   - AMQP: 5672
   - Management UI: 15672
-- Product service: 3001
-- API Gateway: 3003
-- (Nếu có, kiểm tra `auth` và `order` trong cấu hình để biết port thực tế)
+- Product service: 3001 (mặc định)
+- API Gateway: 3003 (mặc định)
+- Auth / Order: kiểm tra file cấu hình tương ứng để biết port thực tế
 
-Xem `docker-compose.yaml` để biết cấu hình chi tiết và các tên service.
+## Biến môi trường (ví dụ)
+Mỗi service nên có file `.env` hoặc sử dụng biến môi trường cấu hình trong `docker-compose.yml`. Dưới đây là ví dụ các biến phổ biến:
 
-## Yêu cầu
-- Docker & Docker Compose (hỗ trợ `version: '3.8'` trong `docker-compose.yaml`)
-- Node.js (nếu muốn chạy từng service cục bộ)
-- (Tùy chọn) npm hoặc yarn để cài dependencies khi chạy local
+| Biến | Mô tả |
+|------|-------|
+| MONGO_URI | URI kết nối MongoDB (ví dụ: mongodb://mongo:27017/eproject) |
+| RABBITMQ_URL | URL RabbitMQ (ví dụ: amqp://rabbitmq:5672) |
+| JWT_SECRET | Khóa bí mật cho JWT |
+| PORT | Port chạy service |
+
+Gợi ý: Tạo file `*.env.example` cho từng service (ví dụ `product/.env.example`, `auth/.env.example`) để hướng dẫn thiết lập.
 
 ## Chạy toàn bộ hệ thống (khuyến nghị)
-Mở terminal (PowerShell, bash, v.v.) tại thư mục gốc của repo và chạy:
+Từ thư mục gốc của repo:
 
-PowerShell:
-```powershell
+Chạy ở foreground:
+```bash
 docker-compose up --build
 ```
 
-Hoặc chạy ở chế độ nền (detached):
-```powershell
+Chạy ở chế độ nền (detached):
+```bash
 docker-compose up --build -d
 ```
 
-Dừng và xóa các container, network:
-```powershell
+Dừng và xóa container, network:
+```bash
 docker-compose down
 ```
 
-Ghi chú: Nếu muốn chạy chỉ các dependency (MongoDB và RabbitMQ) để phát triển cục bộ, có thể khởi chạy riêng:
-```powershell
+Chỉ khởi động dependencies (ví dụ MongoDB và RabbitMQ) khi phát triển:
+```bash
 # Chỉ bật mongo và rabbitmq
 docker-compose up -d mongo rabbitmq
 ```
 
-## Chạy từng service cục bộ (phát triển)
-Mỗi service có thể chạy độc lập để phát triển hoặc debug.
+## Chạy từng service cục bộ (phát triển / debug)
+Mỗi service có thể chạy độc lập:
 
-Ví dụ chạy `product` cục bộ:
+Ví dụ chạy service product:
 ```bash
 cd product
 npm install
+# hoặc yarn
 npm start
+# hoặc script phát triển, ví dụ npm run dev (nếu có)
 ```
 
-Tương tự cho `auth`, `order`, `api-gateway` — vào thư mục tương ứng, cài dependencies và chạy `npm start` hoặc script phù hợp. Đảm bảo cấu hình biến môi trường trỏ tới MongoDB / RabbitMQ đang chạy.
+Tương tự cho `auth`, `order`, `api-gateway`. Đảm bảo các biến môi trường trỏ tới MongoDB / RabbitMQ đang chạy (cục bộ hoặc container).
 
 ## Chạy test
-- Root repo có script test chung (`mocha`) trong `package.json` (nếu đã cấu hình).
-- Mỗi service có thể có script test riêng (ví dụ `product` có `npm test`).
+- Mỗi service có thể có script test riêng (ví dụ `npm test`).
+- Nếu repo root có script test tổng hợp, có thể chạy từ root.
 
-Ví dụ:
+Ví dụ chạy test cho product:
 ```bash
-# Chạy test cho service product
 cd product
 npm install
 npm test
+```
 
-# Hoặc chạy test toàn cục (nếu script tại root được cấu hình)
+Ví dụ chạy test từ root (nếu có cấu hình):
+```bash
 npm test
 ```
 
-## Cấu hình môi trường
-Các service sử dụng file `.env` (ví dụ `product/.env`, `auth/.env`, `order/.env`) và các biến này được tham chiếu trong `docker-compose.yaml`. Trước khi chạy trong môi trường production:
-- Kiểm tra và cập nhật các biến môi trường: database URI, RabbitMQ URL, JWT secret, v.v.
-- Tạo file `.env.example` cho từng service để dễ hướng dẫn thiết lập (khuyến nghị).
-
-Ví dụ các biến phổ biến:
-- MONGO_URI
-- RABBITMQ_URL
-- JWT_SECRET
-- PORT
+## Debugging & Tips
+- Kiểm tra logs:
+  - Docker: `docker-compose logs -f <service-name>`
+  - Node: console logs hoặc debugger (ví dụ VS Code)
+- Kiểm tra kết nối DB/RabbitMQ nếu service không hoạt động (URI, network trong docker-compose).
+- Nếu thay đổi cấu trúc code, rebuild image: `docker-compose up --build`.
 
 ## Gợi ý cải tiến
-- Thêm file `.env.example` cho từng service để dễ thiết lập.
-- Thêm script phát triển (ví dụ `npm run dev` với nodemon).
-- Thêm CI (GitHub Actions) để build và chạy test tự động khi push.
-- Thêm hướng dẫn cấu hình cho môi trường production và staging.
-- Thêm phần API docs / Postman collection hoặc OpenAPI spec.
+- Thêm file `.env.example` cho từng service.
+- Thêm script dev (`npm run dev`) sử dụng nodemon.
+- Mở rộng CI (GitHub Actions) để chạy build & test tự động.
+- Thêm OpenAPI/Swagger hoặc Postman collection cho API docs.
+- Thêm hướng dẫn deploy cho staging/production (k8s, docker stack, v.v.)
 
-## Liên hệ / Đóng góp
-Nếu cần hỗ trợ hoặc muốn đóng góp, vui lòng mở issue hoặc PR trong repository này.
+## Đóng góp
+Mọi đóng góp rất hoan nghênh — vui lòng mở issue mô tả vấn đề/ý tưởng hoặc gửi PR theo chuẩn contribution của repo.
 
 ---
 
-Tạo bởi team dự án. Cập nhật README khi có thay đổi cấu trúc hoặc ports.
-
+Tạo bởi team dự án — cập nhật README khi có thay đổi cấu trúc, ports hoặc cách triển khai.
